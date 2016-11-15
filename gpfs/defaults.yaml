@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+
+gpfs:
+
+  # The NSD servers to grab the gpfs from
+  servers:
+    - gpfs01
+    - gpfs02
+
+  # The GPFS cluster to join
+  clustername: gpfs.cluster
+  
+  # The maximum value for vm.min_free_kbytes should be allowed
+  # Anything more than this doesn't make sense
+  min_free_kbytes_max_value: 15254502
+
+  # Label this state to be enabled or disabled
+  enabled: true
+
+  # The device that will be mounted and used
+  devices:
+    gpfs:
+      name: gpfs
+      mount: /gpfs
+
+  # The repo to use for 
+  repos:
+    type: local
+    server: xcat
+    path: /install/post/otherpkgs/gpfs

@@ -1,0 +1,19 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+
+gpfs:
+
+  # The NSD servers to grab the gpfs from
+  servers:
+    - gpfs01
+    - gpfs02
+
+  # The GPFS cluster to join
+  clustername: gpfs.cluster
+
+  # Label this state to be enabled or disabled
+  enabled: true
+
+  # The device that will be mounted and used
+  devices:
+    - gpfs
