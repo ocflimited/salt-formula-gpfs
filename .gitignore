@@ -1,2 +1,9 @@
-.pydevproject
+*.swp
+*~
+*.pyc
+*.xcworkspace
 org.eclipse.*
+.settings
+.DS_Store
+.pydevproject
+.project
