@@ -11,9 +11,21 @@ gpfs:
   # The GPFS cluster to join
   clustername: gpfs.cluster
 
+  # The maximum value for vm.min_free_kbytes should be allowed
+  # Anything more than this doesn't make sense
+  min_free_kbytes_max_value: 15254502
+
   # Label this state to be enabled or disabled
   enabled: true
 
   # The device that will be mounted and used
   devices:
-    - gpfs
+    gpfs:
+      name: gpfs
+      mount: /gpfs
+
+  # The repo to use for
+  repo:
+    type: local
+    server: xcat
+    path: /install/post/otherpkgs/repos/gpfs
