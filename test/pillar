@@ -21,7 +21,7 @@ gpfs:
   # Build the portability layer.
   # If set to false, the configs will expect to have the rpm already available
   # If set to true, then the formula will compile the portability layer 
-  rebuild: false
+  rebuild: true
 
   # The device that will be mounted and used
   devices:
@@ -32,5 +32,5 @@ gpfs:
   # The repo to use for
   repo:
     type: local
-    server: xcat
-    path: /install/post/otherpkgs/repos/gpfs
+    server: mirror.ocf.co.uk
+    path: /gpfs/el7/latest

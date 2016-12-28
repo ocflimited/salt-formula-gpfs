@@ -1,0 +1,5 @@
+books:
+  - book: "srv/formulas/ofed"
+    git: "git@gitlab.ocf.co.uk:salt/salt-formula-ofed.git"
+  - book: "srv/salt/ofed"
+    link: "../formulas/ofed/ofed"

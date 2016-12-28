@@ -18,6 +18,11 @@ gpfs:
   # Label this state to be enabled or disabled
   enabled: true
 
+  # Build the portability layer.
+  # If set to false, the configs will expect to have the rpm already available
+  # If set to true, then the formula will compile the portability layer 
+  rebuild: false
+
   # The device that will be mounted and used
   devices:
     gpfs:

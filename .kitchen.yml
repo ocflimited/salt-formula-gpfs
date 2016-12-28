@@ -1,0 +1,33 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: centos-7
+    driver_config:
+      image: corux/centos7-salt
+      privileged: True
+      run_command: /usr/sbin/init
+
+provisioner:
+  name: salt_solo
+  formula: gpfs
+  vendor_path: srv/salt
+  pillars-from-files:
+    gpfs.sls: test/pillar
+    ofed.sls: srv/formulas/ofed/test/pillar
+  pillars:
+    top.sls:
+      base:
+        "*":
+          - gpfs
+          - ofed
+  state_top:
+    base:
+      "*":
+        - ofed.infiniband
+        - gpfs
+        - gpfs.tuning
+
+suites:
+  - name: default
