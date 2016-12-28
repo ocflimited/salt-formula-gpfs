@@ -15,6 +15,6 @@ gpfs.cluster:
     - master: {{ gpfs.servers[0] }}
 {% endif %}
     - require:
-      - pkg: gpfspkgs
+      - pkg: gpfs
     - require_in:
-      - service: gpfs.service
+      - service: gpfs

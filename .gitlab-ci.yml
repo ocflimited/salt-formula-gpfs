@@ -1,0 +1,25 @@
+stages:
+  - test
+  - cleanup
+
+test:
+  stage: test
+  before_script:
+    - bundle install
+    - sudo pip install -r test-requirements.txt
+    - gitshelf install
+  script:
+    - kitchen test
+  after_script:
+    - kitchen destroy all
+
+cleanup:
+  stage: cleanup
+  before_script:
+    - bundle install
+  script:
+    - kitchen list
+    - kitchen destroy all
+    - kitchen diagnose --all
+    - bundle clean --force
+  when: on_failure

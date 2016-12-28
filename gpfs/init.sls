@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 # vim: ft=sls
 
-gpfs.repo:
+{% from "gpfs/map.jinja" import gpfs with context %}
+{% from "ofed/map.jinja" import ofed with context %}
+
+gpfs:
   pkgrepo.managed:
     - name: gpfs
     - humanname: GPFS RPMs
-    - baseurl: http://{{ salt['dnsutil.A'](gpfs.repo.server + '.' + grains['domain'])[0] }}{{ gpfs.repo.path }}
+    - baseurl: http://{{ gpfs.repo.server }}{{ gpfs.repo.path }}
     - gpgcheck: 0
     - disabled: 1
-
-gpfspkgs:
   pkg.installed:
     - pkgs:
       - gpfs.base
@@ -21,27 +22,8 @@ gpfspkgs:
     - fromrepo: gpfs
     - refresh: True
     - require:
-      - pkgrepo: gpfs.repo
+      - pkgrepo: gpfs
       - pkg: gpfs-dep-pkg
-
-gpfsgplbin-pkg:
-  pkg.installed:
-    - name: gpfs.gplbin-{{ grains['kernelrelease'] + '.' + grains['osarch'] }}
-    - fromrepo: gpfs
-    - refresh: True
-    - require:
-      - pkgrepo: gpfs.repo
-      - pkg: gpfs-dep-pkg
-      - pkg: gpfspkgs
-
-gpfs-dep-pkg:
-  pkg.latest:
-    - pkgs:
-      - ksh
-      - m4
-      - net-tools
-
-gpfs.service:
   file.managed:
     - name: /etc/init.d/gpfs
     - source: salt://gpfs/files/gpfs
@@ -55,11 +37,46 @@ gpfs.service:
     - name: gpfs
     - enable: True
     - require:
-      - pkg: gpfspkgs
-      - file: gpfs.service
-{%- if pillar['ofed']['enabled'] %}
+      - pkg: gpfs
+      - file: gpfs
+{%- if ofed.enabled %}
       - service: openibd
 {%- endif %}
+
+gpfsgplbin:
+{% if not gpfs.rebuild %}
+  pkg.installed:
+    - name: gpfs.gplbin-{{ grains['kernelrelease'] + '.' + grains['osarch'] }}
+    - fromrepo: gpfs
+    - refresh: True
+    - require:
+      - pkgrepo: gpfs
+      - pkg: gpfs-dep-pkg
+      - pkg: gpfs
+{% else %}
+  cmd.run:
+    - name: LINUX_DISTRIBUTION=REDHAT_AS_LINUX /usr/lpp/mmfs/bin/mmbuildgpl
+    - require:
+      - pkg: gplbuilddeps
+
+gplbuilddeps:
+  pkg.installed:
+    - pkgs:
+      - gcc
+      - gcc-c++
+      - kernel-devel
+      - kernel-headers
+      - make
+
+{% endif %}
+
+gpfs-dep-pkg:
+  pkg.latest:
+    - pkgs:
+      - ksh
+      - libaio
+      - m4
+      - net-tools
 
 gpfs.profile.sh:
   file.managed:
