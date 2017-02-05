@@ -44,13 +44,21 @@ case "$1" in
     start)
       /usr/lpp/mmfs/bin/mmautoload reboot >$outDev 2>&1
       touch /var/lock/subsys/gpfs >$outDev 2>&1
+      for i in `seq 1 24` # Wait upto 2 mins for the IB to be ready (24x5s=120s)
+      do
+        if grep -q gpfs /proc/mounts
+        then
+          break
+        fi
+        sleep 5
+      done
       ;;
     stop)
       if [ $osName = Linux -a -e /usr/lpp/mmfs/bin/mmnfsinit ]; then
-          /usr/lpp/mmfs/bin/mmnfsinit stop >$outDev 2>&1
+        /usr/lpp/mmfs/bin/mmnfsinit stop >$outDev 2>&1
       else
         /usr/lpp/mmfs/bin/tsctl quorumState >/dev/null 2>&1  &&
-            /usr/lpp/mmfs/bin/mmshutdown >$outDev 2>&1
+        /usr/lpp/mmfs/bin/mmshutdown >$outDev 2>&1
       fi
       rm -f /var/lock/subsys/gpfs >$outDev 2>&1
       ;;
@@ -73,4 +81,3 @@ case "$1" in
 esac
 
 exit 0
-

@@ -14,7 +14,18 @@ gpfs.cluster:
 {% else %}
     - master: {{ gpfs.servers[0] }}
 {% endif %}
+    - runas: root
     - require:
       - pkg: gpfs
+{% if pillar['ofed'] is defined %}
+      - network: ib0.device
+{% endif %}
     - require_in:
+      - service: gpfs
+
+mmmount_all:
+  cmd.run:
+    - name: sleep 30 ; mmmount all
+    - require:
+      - gpfs: gpfs.cluster
       - service: gpfs

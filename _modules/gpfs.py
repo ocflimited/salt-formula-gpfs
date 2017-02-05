@@ -21,7 +21,7 @@ def __virtual__():
     Verify gpfs is installed.
     '''
     os.environ["PATH"] += os.pathsep + '/usr/lpp/mmfs/bin'
-    return salt.utils.which('mmgetstate') is not None
+    return salt.utils.which('/usr/lpp/mmfs/bin/mmgetstate') is not None
 
 
 def cluster_configured(runas=None):
@@ -35,8 +35,8 @@ def cluster_configured(runas=None):
         salt '*' gpfs.cluster_configured
     '''
     ret = True
-    res = __salt__['cmd.run']('mmlscluster',
-                              runas=runas)
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmlscluster',
+                              runas=runas,shell='/bin/bash')
     for line in res.splitlines():
         if 'node does not belong' in line:
           ret = False
@@ -54,8 +54,8 @@ def cluster_member(clustername, runas=None):
         salt '*' gpfs.cluster_joined gpfs.cluster
     '''
     ret = False
-    res = __salt__['cmd.run']('mmlscluster',
-                              runas=runas)
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmlscluster',
+                              runas=runas,shell='/bin/bash')
     for line in res.splitlines():
         if 'GPFS cluster name' in line:
           parts = line.split(':')
@@ -77,11 +77,11 @@ def join_cluster(master, runas=None):
         salt '*' gpfs.join_cluster server1
     '''
     ret = False
-    res = __salt__['cmd.run']('mmsdrrestore -p {0} -R /usr/bin/scp'.format(master),
-                              runas=runas)
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmsdrrestore -p {0} -R /usr/bin/scp'.format(master),
+                              runas=runas,shell='/bin/bash')
     for line in res.splitlines():
         if 'successfully restored' in line:
           ret = True
-          __salt__['cmd.run']('mmstartup')
+          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup')
     return ret
 

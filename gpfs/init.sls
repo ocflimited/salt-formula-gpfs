@@ -23,7 +23,7 @@ gpfs:
     - refresh: True
     - require:
       - pkgrepo: gpfs
-      - pkg: gpfs-dep-pkg
+      - pkg: gpfsdeps
   file.managed:
     - name: /etc/init.d/gpfs
     - source: salt://gpfs/files/gpfs
@@ -51,7 +51,7 @@ gpfsgplbin:
     - refresh: True
     - require:
       - pkgrepo: gpfs
-      - pkg: gpfs-dep-pkg
+      - pkg: gpfsdeps
       - pkg: gpfs
 {% else %}
   cmd.run:
@@ -67,10 +67,9 @@ gplbuilddeps:
       - kernel-devel
       - kernel-headers
       - make
-
 {% endif %}
 
-gpfs-dep-pkg:
+gpfsdeps:
   pkg.latest:
     - pkgs:
       - ksh
