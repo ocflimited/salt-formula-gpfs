@@ -3,6 +3,10 @@
 
 gpfs:
 
+  # The version type of GPFS to install on the system
+  # This can be one of: express, standard or advanced
+  version_type: standard
+
   # The NSD servers to grab the gpfs from
   servers:
     - gpfs01

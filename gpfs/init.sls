@@ -14,11 +14,18 @@ gpfs:
   pkg.installed:
     - pkgs:
       - gpfs.base
-      - gpfs.ext
-      - gpfs.gskit
       - gpfs.docs
       - gpfs.gpl
+      - gpfs.gskit
       - gpfs.msg.en_US
+{% if gpfs.version_type == "standard" or gpfs.version_type == "advanced" %}
+      - gpfs.ext
+      - gpfs.gui
+{% if gpfs.version_type ==  "advanced" %}
+      - gpfs.adv
+      - gpfs.crypto
+{% endif %}
+{% endif %}
     - fromrepo: gpfs
     - refresh: True
     - require:
