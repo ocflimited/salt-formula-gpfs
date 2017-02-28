@@ -20,7 +20,9 @@ gpfs:
       - gpfs.msg.en_US
 {% if gpfs.version_type == "standard" or gpfs.version_type == "advanced" %}
       - gpfs.ext
+{% if gpfs.gui_enabled %}
       - gpfs.gui
+{% endif %}
 {% if gpfs.version_type ==  "advanced" %}
       - gpfs.adv
       - gpfs.crypto

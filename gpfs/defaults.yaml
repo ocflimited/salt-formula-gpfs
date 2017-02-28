@@ -7,6 +7,9 @@ gpfs:
   # This can be one of: express, standard or advanced
   version_type: express
 
+  # The GUI is disabled by default
+  gui_enabled: False
+
   # The NSD servers to grab the gpfs from
   servers:
     - gpfs01
