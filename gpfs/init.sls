@@ -76,7 +76,6 @@ gplbuilddeps:
       - kernel-devel
       - kernel-headers
       - make
-      - perl
 {% endif %}
 
 gpfsdeps:
@@ -86,6 +85,7 @@ gpfsdeps:
       - libaio
       - m4
       - net-tools
+      - perl
 
 gpfs.profile.sh:
   file.managed:
