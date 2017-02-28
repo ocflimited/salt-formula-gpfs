@@ -76,6 +76,7 @@ gplbuilddeps:
       - kernel-devel
       - kernel-headers
       - make
+      - perl
 {% endif %}
 
 gpfsdeps:
