@@ -4,6 +4,12 @@
 {% from "gpfs/map.jinja" import gpfs with context %}
 {% from "ofed/map.jinja" import ofed with context %}
 
+{% if gpfs.kernel_version is defined %}
+{% set kernel_version=gpfs.kernel_version %}
+{% else %}
+{% set kernel_version=grains['kernelrelease'] + '.' + grains['osarch'] %}
+{% endif %}
+
 gpfs:
   pkgrepo.managed:
     - name: gpfs
@@ -48,14 +54,14 @@ gpfs:
     - require:
       - pkg: gpfs
       - file: gpfs
-{%- if ofed.enabled %}
+{%- if ofed.enabled and ofed.type == "mellanox" %}
       - service: openibd
 {%- endif %}
 
 gpfsgplbin:
 {% if not gpfs.rebuild %}
   pkg.installed:
-    - name: gpfs.gplbin-{{ grains['kernelrelease'] + '.' + grains['osarch'] }}
+    - name: gpfs.gplbin-{{ kernel_version }}
     - fromrepo: gpfs
     - refresh: True
     - require:
@@ -73,8 +79,8 @@ gplbuilddeps:
     - pkgs:
       - gcc
       - gcc-c++
-      - kernel-devel
-      - kernel-headers
+      - kernel-devel-{{ kernel_version }}
+      - kernel-headers-{{ kernel_version }}
       - make
 {% endif %}
 
