@@ -77,6 +77,7 @@ gplbuilddeps:
       - kernel-headers
       - make
       - perl
+    - refresh: True
 {% endif %}
 
 gpfsdeps:
@@ -86,6 +87,7 @@ gpfsdeps:
       - libaio
       - m4
       - net-tools
+    - refresh: True
 
 gpfs.profile.sh:
   file.managed:
