@@ -48,7 +48,7 @@ gpfs:
     - require:
       - pkg: gpfs
       - file: gpfs
-{%- if ofed.enabled %}
+{%- if ofed.enabled and "nicips.ib0" in pillar['xcat']['node'].iteritems()%}
       - service: openibd
 {%- endif %}
 

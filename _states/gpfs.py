@@ -61,6 +61,9 @@ def joined(cluster,
             changes['new'] = 'joined via: ' + master
             ret['result'] = True
             ret['comment'] = 'Joined GPFS cluster ' + cluster
+          else:
+            ret['result'] = False
+            ret['comment'] = 'Could not join the cluster'
       else:
         ret['result'] = False
         ret['comment'] = 'Member of existing GPFS cluster'
@@ -71,4 +74,3 @@ def joined(cluster,
     ret['changes'] = changes
 
     return ret
-
