@@ -82,7 +82,8 @@ def join_cluster(master, runas=None):
     for line in res.splitlines():
         if 'successfully restored' in line:
           ret = True
-          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',runas=runas,shell='/bin/bash')
+          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                              runas=runas,shell='/bin/bash')
     if ret == False: 
         res2 = __salt__['cmd.run']('/usr/bin/ssh {0} /usr/lpp/mmfs/bin/mmaddnode -N {1}'.format(master,__grains__['host']),
                                    runas=runas,shell='/bin/bash')
@@ -91,5 +92,6 @@ def join_cluster(master, runas=None):
             ret = True
             __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmchlicense client --accept -N {0}'.format(__grains__['host']),
                                 runas=runas,shell='/bin/bash')
-            __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',runas=runas,shell='/bin/bash')
+            __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                                runas=runas,shell='/bin/bash')
     return ret

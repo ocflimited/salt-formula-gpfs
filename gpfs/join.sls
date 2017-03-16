@@ -17,6 +17,7 @@ gpfs.cluster:
     - runas: root
     - require:
       - pkg: gpfs
+      - gpfsgplbin
 {% if pillar['ofed'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems() %}
       - network: ib0.device
 {% endif %}
