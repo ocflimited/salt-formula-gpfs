@@ -5,6 +5,9 @@
 
 include:
   - gpfs
+{% if pillar['ofed'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems() %}
+  - network
+{% endif %}
 
 gpfs.cluster:
   gpfs.joined:
