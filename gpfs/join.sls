@@ -27,9 +27,15 @@ gpfs.cluster:
     - require_in:
       - service: gpfs
 
+gpfs.start:
+  gpfs.started:
+    - require:
+      - gpfs: gpfs.cluster
+
 mmmount_all:
   cmd.run:
     - name: sleep 30 ; mmmount all
     - require:
       - gpfs: gpfs.cluster
+      - gpfs: gpfs.start
       - service: gpfs

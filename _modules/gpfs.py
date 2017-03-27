@@ -95,3 +95,31 @@ def join_cluster(master, runas=None):
             __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
                                 runas=runas,shell='/bin/bash')
     return ret
+
+def cluster_started(runas=None):
+    '''
+    Checks to see if the GPFS cluster has been started
+    '''
+    ret = False
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmgetstate',
+                              runas=runas,shell='/bin/bash')
+    for line in res.splitlines():
+      if __grains__['host'] in line:
+        parts = line.split()
+        started = parts[2].strip()
+        if started == "active":
+          ret = True
+
+    return ret
+
+def start_cluster(runas=None):
+    '''
+    Starts GPFS on the node
+    '''
+    ret = False
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                              runas=runas,shell='/bin/bash')
+    for line in res.splitlines():
+      if 'mmstartup: Starting GPFS ...' in line:
+        ret = True
+    return ret
