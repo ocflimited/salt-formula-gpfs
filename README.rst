@@ -38,47 +38,47 @@ This state is dependant on:
 Example Pillar
 ==============
 
-```
-# -*- coding: utf-8 -*-
-# vim: ft=yaml
+.. code-block::
 
-gpfs:
-
-  # The version type of GPFS to install on the system
-  # This can be one of: express, standard or advanced
-  version_type: standard
-
-  # The GUI is disabled by default
-  gui_enabled: False
-
-  # The NSD servers to grab the gpfs from
-  servers:
-    - gpfs01
-    - gpfs02
-
-  # The GPFS cluster to join
-  clustername: gpfs.cluster
-
-  # The maximum value for vm.min_free_kbytes should be allowed
-  # Anything more than this doesn't make sense
-  min_free_kbytes_max_value: 15254502
-
-  # Label this state to be enabled or disabled
-  enabled: true
-
-  # Build the portability layer.
-  # If set to false, the configs will expect to have the rpm already available
-  # If set to true, then the formula will compile the portability layer
-  rebuild: false
-
-  # The device that will be mounted and used
-  devices:
-    gpfs:
-      name: gpfs
-      mount: /gpfs
-
-  # The repo to use for
-  repo:
-    server: xcat
-    path: /install/post/otherpkgs/repos/gpfs
-```
+  # -*- coding: utf-8 -*-
+  # vim: ft=yaml
+  
+  gpfs:
+  
+    # The version type of GPFS to install on the system
+    # This can be one of: express, standard or advanced
+    version_type: standard
+  
+    # The GUI is disabled by default
+    gui_enabled: False
+  
+    # The NSD servers to grab the gpfs from
+    servers:
+      - gpfs01
+      - gpfs02
+  
+    # The GPFS cluster to join
+    clustername: gpfs.cluster
+  
+    # The maximum value for vm.min_free_kbytes should be allowed
+    # Anything more than this doesn't make sense
+    min_free_kbytes_max_value: 15254502
+  
+    # Label this state to be enabled or disabled
+    enabled: true
+  
+    # Build the portability layer.
+    # If set to false, the configs will expect to have the rpm already available
+    # If set to true, then the formula will compile the portability layer
+    rebuild: false
+  
+    # The device that will be mounted and used
+    devices:
+      gpfs:
+        name: gpfs
+        mount: /gpfs
+  
+    # The repo to use for
+    repo:
+      server: xcat
+      path: /install/post/otherpkgs/repos/gpfs
