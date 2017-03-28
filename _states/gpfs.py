@@ -80,6 +80,9 @@ def started(runas=None,
 
     '''
     Ensure the current node has started gpfs
+
+    runas
+        The user to run the GPFS command as
     '''
 
     result = __salt__['gpfs.cluster_started'](runas=runas)

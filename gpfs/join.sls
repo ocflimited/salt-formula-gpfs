@@ -5,7 +5,7 @@
 
 include:
   - gpfs
-{% if pillar['ofed'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems() %}
+{% if pillar['ofed'] is defined and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
   - network
 {% endif %}
 
@@ -21,7 +21,7 @@ gpfs.cluster:
     - require:
       - pkg: gpfs
       - gpfsgplbin
-{% if pillar['ofed'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems() %}
+{% if pillar['ofed'] is defined and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
       - network: ib0.device
 {% endif %}
     - require_in:

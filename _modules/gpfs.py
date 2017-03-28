@@ -99,6 +99,11 @@ def join_cluster(master, runas=None):
 def cluster_started(runas=None):
     '''
     Checks to see if the GPFS cluster has been started
+
+    CLI Example:
+
+    .. code-block:: bash
+        salt '*' gpfs.cluster_started
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmgetstate',
@@ -115,6 +120,11 @@ def cluster_started(runas=None):
 def start_cluster(runas=None):
     '''
     Starts GPFS on the node
+
+    CLI Example:
+
+    .. code-block:: bash
+        salt '*' gpfs.start_cluster
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
