@@ -61,6 +61,9 @@ def joined(cluster,
             changes['new'] = 'joined via: ' + master
             ret['result'] = True
             ret['comment'] = 'Joined GPFS cluster ' + cluster
+          else:
+            ret['result'] = False
+            ret['comment'] = 'Could not join the cluster'
       else:
         ret['result'] = False
         ret['comment'] = 'Member of existing GPFS cluster'
@@ -72,3 +75,38 @@ def joined(cluster,
 
     return ret
 
+def started(runas=None,
+            **kwargs):
+
+    '''
+    Ensure the current node has started gpfs
+
+    runas
+        The user to run the GPFS command as
+    '''
+
+    result = __salt__['gpfs.cluster_started'](runas=runas)
+    changes = {}
+    ret = { 'name' : __grains__['host'] }
+
+    if result == False:
+      if __opts__['test']:
+        ret['result'] = None
+        ret['comment'] = "GPFS would be started"
+      else:
+        res1 = __salt__['gpfs.start_cluster'](runas=runas)
+        if res1 == False:
+          ret['result'] = False
+          ret['comment'] = "There was an error start GPFS"
+        else:
+          changes['old'] = 'gpfs down'
+          changes['new'] = 'gpfs started'
+          ret['result'] = True
+          ret['comment'] = 'GPFS was started'
+    else:
+      ret['result'] = True
+      ret['comment'] = 'GPFS is already active'
+
+    ret['changes'] = changes
+
+    return ret

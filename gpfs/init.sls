@@ -54,7 +54,7 @@ gpfs:
     - require:
       - pkg: gpfs
       - file: gpfs
-{%- if ofed.enabled and ofed.type == "mellanox" %}
+{%- if ofed.enabled and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
       - service: openibd
 {%- endif %}
 
@@ -82,6 +82,8 @@ gplbuilddeps:
       - kernel-devel-{{ kernel_version }}
       - kernel-headers-{{ kernel_version }}
       - make
+      - perl
+    - refresh: True
 {% endif %}
 
 gpfsdeps:
@@ -92,6 +94,7 @@ gpfsdeps:
       - m4
       - net-tools
       - perl
+    - refresh: True
 
 gpfs.profile.sh:
   file.managed:
