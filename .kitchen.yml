@@ -5,7 +5,7 @@ driver:
 platforms:
   - name: centos-7
     driver_config:
-      image: corux/centos7-salt
+      image: arifali/centos7-salt
       privileged: True
       run_command: /usr/sbin/init
 
@@ -25,7 +25,6 @@ provisioner:
   state_top:
     base:
       "*":
-        - ofed.infiniband
         - gpfs
         - gpfs.tuning
 
