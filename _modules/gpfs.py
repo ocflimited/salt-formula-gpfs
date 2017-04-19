@@ -21,7 +21,7 @@ def __virtual__():
     Verify gpfs is installed.
     '''
     os.environ["PATH"] += os.pathsep + '/usr/lpp/mmfs/bin'
-    return salt.utils.which('/usr/lpp/mmfs/bin/mmgetstate') is not None
+    return salt.utils.which('mmgetstate') is not None
 
 
 def cluster_configured(runas=None):
@@ -82,6 +82,54 @@ def join_cluster(master, runas=None):
     for line in res.splitlines():
         if 'successfully restored' in line:
           ret = True
-          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup')
+          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                              runas=runas,shell='/bin/bash')
+    if ret == False: 
+        res2 = __salt__['cmd.run']('/usr/bin/ssh {0} /usr/lpp/mmfs/bin/mmaddnode -N {1}'.format(master,__grains__['host']),
+                                   runas=runas,shell='/bin/bash')
+        for line in res2.splitlines():
+          if 'Command successfully completed' in line:
+            ret = True
+            __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmchlicense client --accept -N {0}'.format(__grains__['host']),
+                                runas=runas,shell='/bin/bash')
+            __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                                runas=runas,shell='/bin/bash')
     return ret
 
+def cluster_started(runas=None):
+    '''
+    Checks to see if the GPFS cluster has been started
+
+    CLI Example:
+
+    .. code-block:: bash
+        salt '*' gpfs.cluster_started
+    '''
+    ret = False
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmgetstate',
+                              runas=runas,shell='/bin/bash')
+    for line in res.splitlines():
+      if __grains__['host'] in line:
+        parts = line.split()
+        started = parts[2].strip()
+        if started == "active":
+          ret = True
+
+    return ret
+
+def start_cluster(runas=None):
+    '''
+    Starts GPFS on the node
+
+    CLI Example:
+
+    .. code-block:: bash
+        salt '*' gpfs.start_cluster
+    '''
+    ret = False
+    res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                              runas=runas,shell='/bin/bash')
+    for line in res.splitlines():
+      if 'mmstartup: Starting GPFS ...' in line:
+        ret = True
+    return ret

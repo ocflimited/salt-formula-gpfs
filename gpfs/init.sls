@@ -2,7 +2,6 @@
 # vim: ft=sls
 
 {% from "gpfs/map.jinja" import gpfs with context %}
-{% from "ofed/map.jinja" import ofed with context %}
 
 {% if gpfs.kernel_version is defined %}
 {% set kernel_version=gpfs.kernel_version %}
@@ -54,7 +53,7 @@ gpfs:
     - require:
       - pkg: gpfs
       - file: gpfs
-{%- if ofed.enabled and ofed.type == "mellanox" %}
+{%- if pillar['ofed'] is defined and pillarp['ofed']['type'] == "mellanox" and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
       - service: openibd
 {%- endif %}
 
@@ -82,6 +81,8 @@ gplbuilddeps:
       - kernel-devel-{{ kernel_version }}
       - kernel-headers-{{ kernel_version }}
       - make
+      - perl
+    - refresh: True
 {% endif %}
 
 gpfsdeps:
@@ -92,6 +93,7 @@ gpfsdeps:
       - m4
       - net-tools
       - perl
+    - refresh: True
 
 gpfs.profile.sh:
   file.managed:
