@@ -7,6 +7,6 @@ org.eclipse.*
 .DS_Store
 .pydevproject
 .project
-.kitchen
 srv
+.kitchen
 Gemfile.lock

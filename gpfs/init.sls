@@ -2,7 +2,17 @@
 # vim: ft=sls
 
 {% from "gpfs/map.jinja" import gpfs with context %}
-{% from "ofed/map.jinja" import ofed with context %}
+
+{% if pillar['ofed'] is defined %}
+include:
+  - ofed.infiniband
+{% endif %}
+
+{% if gpfs.kernel_version is defined %}
+{% set kernel_version=gpfs.kernel_version %}
+{% else %}
+{% set kernel_version=grains['kernelrelease'] + '.' + grains['osarch'] %}
+{% endif %}
 
 gpfs:
   pkgrepo.managed:
@@ -48,14 +58,14 @@ gpfs:
     - require:
       - pkg: gpfs
       - file: gpfs
-{%- if ofed.enabled and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
+{%- if pillar['ofed'] is defined and pillar['ofed']['type'] == "mellanox" and (pillar['xcat'] is defined and "nicips.ib0" in pillar['xcat']['node'].iteritems()) %}
       - service: openibd
 {%- endif %}
 
 gpfsgplbin:
 {% if not gpfs.rebuild %}
   pkg.installed:
-    - name: gpfs.gplbin-{{ grains['kernelrelease'] + '.' + grains['osarch'] }}
+    - name: gpfs.gplbin-{{ kernel_version }}
     - fromrepo: gpfs
     - refresh: True
     - require:
@@ -63,10 +73,29 @@ gpfsgplbin:
       - pkg: gpfsdeps
       - pkg: gpfs
 {% else %}
+{% if not gpfs.mcr %}
   cmd.run:
     - name: LINUX_DISTRIBUTION=REDHAT_AS_LINUX /usr/lpp/mmfs/bin/mmbuildgpl
     - require:
       - pkg: gplbuilddeps
+{% else %}
+  cmd.run:
+    - name: >
+        cd /usr/lpp/mmfs/src ;
+        make World
+    - require:
+      - pkg: gplbuilddeps
+      - file: env_mcr
+
+env_mcr:
+  file.managed:
+    - name: /usr/lpp/mmfs/src/config/env.mcr
+    - source: salt://gpfs/files/env.mcr.j2
+    - template: jinja
+    - context:
+      kernel_version: {{ kernel_version }}
+      gpfs_kernel_version: {% for num in (kernel_version.split(".")|join("-")).split("-") %}{% if loop.index < 5 %}{% if loop.index == 1 %}{{num}}{% else %}{% if num|int < 10 %}0{{ num }}{% else %}{{ num }}{% endif %}{% endif %}{% endif %}{% endfor %}
+{% endif %}
 
 gplbuilddeps:
   pkg.installed:
@@ -87,6 +116,7 @@ gpfsdeps:
       - libaio
       - m4
       - net-tools
+      - perl
     - refresh: True
 
 gpfs.profile.sh:

@@ -30,6 +30,11 @@ gpfs:
   # If set to true, then the formula will compile the portability layer 
   rebuild: true
 
+  # Specify a specific kernel, so that mmbuildgpl may not fail
+  kernel_version: 3.10.0-514.16.1.el7.x86_64
+
+  mcr: True
+
   # The device that will be mounted and used
   devices:
     gpfs:
