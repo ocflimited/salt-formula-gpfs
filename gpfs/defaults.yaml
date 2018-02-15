@@ -30,6 +30,11 @@ gpfs:
   # If set to true, then the formula will compile the portability layer 
   rebuild: false
 
+  # If this is set to true, then it will create the relevant env.mcr file
+  # This option is usually not required. But have it there for some
+  # unsyported operating systems
+  mcr: false
+
   # The device that will be mounted and used
   devices:
     gpfs:

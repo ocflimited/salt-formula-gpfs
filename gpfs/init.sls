@@ -92,6 +92,7 @@ env_mcr:
     - name: /usr/lpp/mmfs/src/config/env.mcr
     - source: salt://gpfs/files/env.mcr.j2
     - template: jinja
+    - makedirs: true
     - context:
       kernel_version: {{ kernel_version }}
       gpfs_kernel_version: {% for num in (kernel_version.split(".")|join("-")).split("-") %}{% if loop.index < 5 %}{% if loop.index == 1 %}{{num}}{% else %}{% if num|int < 10 %}0{{ num }}{% else %}{{ num }}{% endif %}{% endif %}{% endif %}{% endfor %}

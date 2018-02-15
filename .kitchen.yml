@@ -5,7 +5,7 @@ driver:
 platforms:
   - name: centos-7
     driver_config:
-      image: arifali/centos7-salt
+      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen
       privileged: True
       run_command: /usr/sbin/init
 
