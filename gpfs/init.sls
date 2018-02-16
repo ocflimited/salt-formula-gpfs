@@ -103,7 +103,7 @@ gplbuilddeps:
     - pkgs:
       - gcc
       - gcc-c++
-      - kernel-devel
+      - kernel-devel: {{ kernel_version }}
       - kernel-headers
       - make
       - perl
