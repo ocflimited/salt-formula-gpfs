@@ -31,7 +31,7 @@ gpfs:
   rebuild: true
 
   # Specify a specific kernel, so that mmbuildgpl may not fail
-  kernel_version: 3.10.0-693.17.1.el7.x86_64
+  kernel_version: 3.10.0-693.17.1.el7
 
   mcr: True
 

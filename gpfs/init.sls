@@ -83,6 +83,7 @@ gpfsgplbin:
     - name: >
         cd /usr/lpp/mmfs/src ;
         make World
+    - unless: ls -l /usr/lpp/mmfs/src/bin/kdump-{{ kernel_version }}.{{ grains['osarch'] }}
     - require:
       - pkg: gplbuilddeps
       - file: env_mcr
