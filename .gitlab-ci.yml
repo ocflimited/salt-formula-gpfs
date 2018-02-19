@@ -11,3 +11,10 @@ test:
     - kitchen test
   after_script:
     - kitchen destroy all
+
+pylint:
+  stage: test
+  before_script:
+    - sudo pip install -r test-requirements.txt
+  script:
+    - pylint --rcfile=.pylintrc --disable=W1307,str-format-in-logging _modules _states
