@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 '''
 Module to provide GPFS compatibility to Salt.
-Todo: A lot...
 '''
-
-# Import salt libs
-import salt.utils
+from __future__ import absolute_import
 
 # Import python libs
 import logging
-import random
-import string
 import os
+
+# Import salt libs
+import salt.utils
 
 log = logging.getLogger(__name__)
 
@@ -36,12 +34,13 @@ def cluster_configured(runas=None):
     '''
     ret = True
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmlscluster',
-                              runas=runas,shell='/bin/bash')
+                              runas=runas, shell='/bin/bash')
     for line in res.splitlines():
         if 'node does not belong' in line:
-          ret = False
+            ret = False
 
     return ret
+
 
 def cluster_member(clustername, runas=None):
     '''
@@ -55,17 +54,18 @@ def cluster_member(clustername, runas=None):
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmlscluster',
-                              runas=runas,shell='/bin/bash')
+                              runas=runas, shell='/bin/bash')
     for line in res.splitlines():
         if 'GPFS cluster name' in line:
-          parts = line.split(':')
-          if len(parts) < 2:
+            parts = line.split(':')
+            if len(parts) < 2:
                 continue
-          cluster = parts[1].strip()
-          if cluster == clustername:
-            ret = True
+            cluster = parts[1].strip()
+            if cluster == clustername:
+                ret = True
 
     return ret
+
 
 def join_cluster(master, runas=None):
     '''
@@ -78,23 +78,24 @@ def join_cluster(master, runas=None):
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmsdrrestore -p {0} -R /usr/bin/scp'.format(master),
-                              runas=runas,shell='/bin/bash')
+                              runas=runas, shell='/bin/bash')
     for line in res.splitlines():
         if 'successfully restored' in line:
-          ret = True
-          __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
-                              runas=runas,shell='/bin/bash')
-    if ret == False: 
-        res2 = __salt__['cmd.run']('/usr/bin/ssh {0} /usr/lpp/mmfs/bin/mmaddnode -N {1}'.format(master,__grains__['host']),
-                                   runas=runas,shell='/bin/bash')
-        for line in res2.splitlines():
-          if 'Command successfully completed' in line:
             ret = True
-            __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmchlicense client --accept -N {0}'.format(__grains__['host']),
-                                runas=runas,shell='/bin/bash')
             __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
-                                runas=runas,shell='/bin/bash')
+                                runas=runas, shell='/bin/bash')
+    if not ret:
+        res2 = __salt__['cmd.run']('/usr/bin/ssh {0} /usr/lpp/mmfs/bin/mmaddnode -N {1}'.format(master, __grains__['host']),
+                                   runas=runas, shell='/bin/bash')
+        for line in res2.splitlines():
+            if 'Command successfully completed' in line:
+                ret = True
+                __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmchlicense client --accept -N {0}'.format(__grains__['host']),
+                                    runas=runas, shell='/bin/bash')
+                __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
+                                    runas=runas, shell='/bin/bash')
     return ret
+
 
 def cluster_started(runas=None):
     '''
@@ -107,15 +108,16 @@ def cluster_started(runas=None):
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmgetstate',
-                              runas=runas,shell='/bin/bash')
+                              runas=runas, shell='/bin/bash')
     for line in res.splitlines():
-      if __grains__['host'] in line:
-        parts = line.split()
-        started = parts[2].strip()
-        if started == "active":
-          ret = True
+        if __grains__['host'] in line:
+            parts = line.split()
+            started = parts[2].strip()
+            if started == "active":
+                ret = True
 
     return ret
+
 
 def start_cluster(runas=None):
     '''
@@ -128,8 +130,8 @@ def start_cluster(runas=None):
     '''
     ret = False
     res = __salt__['cmd.run']('/usr/lpp/mmfs/bin/mmstartup',
-                              runas=runas,shell='/bin/bash')
+                              runas=runas, shell='/bin/bash')
     for line in res.splitlines():
-      if 'mmstartup: Starting GPFS ...' in line:
-        ret = True
+        if 'mmstartup: Starting GPFS ...' in line:
+            ret = True
     return ret

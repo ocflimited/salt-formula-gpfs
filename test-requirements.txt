@@ -1,1 +1,3 @@
 gitshelf
+pylint
+saltpylint
