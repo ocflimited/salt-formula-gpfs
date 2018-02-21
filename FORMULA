@@ -1,0 +1,7 @@
+name: gpfs
+os: RedHat, CentOS
+os_family: RedHat
+version: 201802
+release: 1
+summary: Formula for installing gpfs
+description: Formula for installing gpfs

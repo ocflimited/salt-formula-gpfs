@@ -1,0 +1,9 @@
+spm_build_exclude:
+  - .git
+  - .kitchen
+  - .project
+  - debian
+  - etc
+  - srv
+  - test
+  - Gemfile.lock

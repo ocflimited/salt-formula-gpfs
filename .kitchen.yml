@@ -3,11 +3,48 @@ driver:
   name: docker
 
 platforms:
-  - name: centos-7
+  - name: centos-6-201611
     driver_config:
-      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen
+      image: registry.ocf.co.uk/salt/docker/centos-6-kitchen:2016.11
+      privileged: True
+      run_command: /sbin/init
+      use_cache: False
+      remove_images: True
+  - name: centos-6-201707
+    driver_config:
+      image: registry.ocf.co.uk/salt/docker/centos-6-kitchen:2017.7
+      privileged: True
+      run_command: /sbin/init
+      use_cache: False
+      remove_images: True
+  - name: centos-7-201611
+    driver_config:
+      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen:2016.11
       privileged: True
       run_command: /usr/sbin/init
+      use_cache: False
+      remove_images: True
+  - name: centos-7-201707
+    driver_config:
+      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen:2017.7
+      privileged: True
+      run_command: /usr/sbin/init
+      use_cache: False
+      remove_images: True
+  - name: ubuntu-16.04-201611
+    driver_config:
+      image: registry.ocf.co.uk/salt/docker/ubuntu-16.04-kitchen:2016.11
+      privileged: True
+      run_command: /sbin/init
+      use_cache: False
+      remove_images: True
+  - name: ubuntu-16.04-201707
+    driver_config:
+      image: registry.ocf.co.uk/salt/docker/ubuntu-16.04-kitchen:2017.7
+      privileged: True
+      run_command: /sbin/init
+      use_cache: False
+      remove_images: True
 
 provisioner:
   name: salt_solo

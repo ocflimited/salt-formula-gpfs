@@ -1,23 +1,31 @@
 # -*- coding: utf-8 -*-
 '''
 Manage GPFS Clusters
-========================
+====================
 
-Example:
+Salt can manage a client node in a GPFS cluster, for example, the following
+block checks to see if the minion is joined to the cluster. If however, the
+minion is not joined, then it will attempt to join to the cluster.
 
 .. code-block:: yaml
 
-      gpfs.joined
+    gpfs.cluster:
+      gpfs.joined:
         - cluster: gpfs.cluster
+        - master: storage01
+
+The following block ensures, that gpfs daemon is started, and is able to
+connect to gpfs
+
+.. code-block:: yaml
+
+    gpfs.start:
+      gpfs.started
 '''
 from __future__ import absolute_import
 
 # Import python libs
 import logging
-import os
-
-# Import salt libs
-import salt.utils
 
 log = logging.getLogger(__name__)
 
@@ -26,8 +34,7 @@ def __virtual__():
     '''
     Only load if GPFS is installed.
     '''
-    os.environ["PATH"] += os.pathsep + '/usr/lpp/mmfs/bin'
-    return salt.utils.which('mmlscluster') is not None
+    return 'gpfs.start_cluster' in __salt__
 
 
 def joined(cluster,

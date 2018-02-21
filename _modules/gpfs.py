@@ -6,10 +6,7 @@ from __future__ import absolute_import
 
 # Import python libs
 import logging
-import os
-
-# Import salt libs
-import salt.utils
+import os.path
 
 log = logging.getLogger(__name__)
 
@@ -18,8 +15,7 @@ def __virtual__():
     '''
     Verify gpfs is installed.
     '''
-    os.environ["PATH"] += os.pathsep + '/usr/lpp/mmfs/bin'
-    return salt.utils.which('mmgetstate') is not None
+    return os.path.isfile('/usr/lpp/mmfs/bin/mmgetstate')
 
 
 def cluster_configured(runas=None):
