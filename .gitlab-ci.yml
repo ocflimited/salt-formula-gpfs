@@ -1,16 +1,46 @@
-stages:
-  - test
+.pkg_default_options: &pkg_default_options
+  before_script:
+    - rm -rf $CI_PROJECT_DIR/debs
+    - rm -rf $CI_PROJECT_DIR/rpms
+    - rm -rf $CI_PROJECT_DIR/spms
+    - rm -rf /tmp/$CI_PROJECT_NAME.tgz
+    - rm -rf $HOME/rpmbuild/RPMS/*/$CI_PROJECT_NAME*.rpm
+    - rm -rf $CI_PROJECT_DIR/../*.deb
+    - rm -rf /srv/spm_build/$CI_PROJECT_NAME*.spm
+  after_script:
+    - rm -rf /tmp/$CI_PROJECT_NAME.tgz
+    - rm -rf $HOME/rpmbuild/RPMS/*/$CI_PROJECT_NAME*.rpm
+    - rm -rf $CI_PROJECT_DIR/../*.deb
+    - rm -rf /srv/spm_build/$CI_PROJECT_NAME*.spm
 
-test:
-  stage: test
+.build_options: &build_options
   before_script:
     - bundle install
     - sudo pip install -r test-requirements.txt
     - gitshelf install
-  script:
-    - kitchen test
   after_script:
     - kitchen destroy all
+
+.test_os: &test_os
+  stage: test
+  script:
+    - JOB_NAME=( $CI_JOB_NAME )
+    - kitchen test default-${JOB_NAME[-3]}-${JOB_NAME[-2]}-${JOB_NAME[-1]}
+  <<: *build_options
+  retry: 1
+
+stages:
+  - test
+  - build
+  - deploy
+
+#test centos 6 201611: *test_os
+test centos 7 201611: *test_os
+#test ubuntu 1604 201611: *test_os
+
+#test centos 6 201707: *test_os
+test centos 7 201707: *test_os
+#test ubuntu 1604 201707: *test_os
 
 pylint:
   stage: test
@@ -18,3 +48,73 @@ pylint:
     - sudo pip install -r test-requirements.txt
   script:
     - pylint --rcfile=.pylintrc --disable=W1307,str-format-in-logging _modules _states
+
+build_rpm:
+  stage: build
+  script:
+    - export VERSION=`git describe --tags --long | awk -F- '{print $1}'`
+    - export RELEASE=`git describe --tags --long | awk -F- '{print $2}'`
+    - sudo yum -y install rpm-build
+    - cd $CI_PROJECT_DIR/.. && tar cfz /tmp/$CI_PROJECT_NAME.tgz $CI_PROJECT_NAME && cd $CI_PROJECT_DIR
+    - rpmbuild -ta --define "version $VERSION" --define "release $RELEASE" /tmp/$CI_PROJECT_NAME.tgz
+    - mkdir -p $CI_PROJECT_DIR/rpms
+    - cp $HOME/rpmbuild/RPMS/*/$CI_PROJECT_NAME*.rpm $CI_PROJECT_DIR/rpms/.
+  artifacts:
+    paths:
+    - rpms/*.rpm
+    expire_in: 7 day
+  <<: *pkg_default_options
+  only:
+    - master
+  tags:
+    - el7
+
+deploy_rpm:
+  stage: deploy
+  script:
+    - export VERSION=`git describe --tags --long | awk -F- '{print $1}'`
+    - export RELEASE=`git describe --tags --long | awk -F- '{print $2}'`
+    - sudo yum -y install rpm-build
+    - cd $CI_PROJECT_DIR/.. && tar cfz /tmp/$CI_PROJECT_NAME.tgz $CI_PROJECT_NAME && cd $CI_PROJECT_DIR
+    - rpmbuild -ta --define "version $VERSION" --define "release $RELEASE" /tmp/$CI_PROJECT_NAME.tgz
+    - ssh -o "StrictHostKeyChecking=no" root@mirror.ocf.co.uk "cd /var/www/html/salt/formula ; rm -rf $CI_PROJECT_NAME*.rpm"
+    - scp -o "StrictHostKeyChecking=no" $HOME/rpmbuild/RPMS/*/$CI_PROJECT_NAME*.rpm root@mirror.ocf.co.uk:/var/www/html/salt/formula
+    - ssh -o "StrictHostKeyChecking=no" root@mirror.ocf.co.uk "cd /var/www/html/salt/formula ; createrepo ."
+  <<: *pkg_default_options
+  only:
+    - master
+  tags:
+    - el7
+
+build_spm:
+  stage: build
+  script:
+    - export PROJ_NAME=`echo $CI_PROJECT_NAME | cut -d - -f 3-`
+    - sudo yum -y install salt
+    - sudo spm build . -c etc
+    - mkdir -p spms
+    - cp /srv/spm_build/$PROJ_NAME*.spm spms/.
+  artifacts:
+    paths:
+    - spms/*.spm
+    expire_in: 7 day
+  <<: *pkg_default_options
+  only:
+    - master
+  tags:
+    - el7
+
+deploy_spm:
+  stage: deploy
+  script:
+    - export PROJ_NAME=`echo $CI_PROJECT_NAME | cut -d - -f 3-`
+    - sudo yum -y install salt
+    - sudo spm build . -c etc
+    - ssh -o "StrictHostKeyChecking=no" root@mirror.ocf.co.uk "cd /var/www/html/salt/formula ; rm -rf $PROJ_NAME*.spm"
+    - scp -o "StrictHostKeyChecking=no" /srv/spm_build/$PROJ_NAME*.spm root@mirror.ocf.co.uk:/var/www/html/salt/formula
+    - ssh -o "StrictHostKeyChecking=no" root@mirror.ocf.co.uk "cd /var/www/html/salt/formula ; spm create_repo ."
+  <<: *pkg_default_options
+  only:
+    - master
+  tags:
+    - el7
