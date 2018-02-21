@@ -3,62 +3,72 @@ driver:
   name: docker
 
 platforms:
-  - name: centos-6-201611
+  - name: centos-6
     driver_config:
-      image: registry.ocf.co.uk/salt/docker/centos-6-kitchen:2016.11
+      image: registry.ocf.co.uk/salt/docker/centos-6-kitchen:base
       privileged: True
       run_command: /sbin/init
       use_cache: False
       remove_images: True
-  - name: centos-6-201707
+    provisioner:
+      salt_yum_repo: 'https://repo.saltstack.com/yum/redhat/$releasever/$basearch/%s'
+      salt_yum_rpm_key: 'https://repo.saltstack.com/yum/redhat/6/x86_64/latest/SALTSTACK-GPG-KEY.pub'
+      salt_install: yum
+      pip_bin: pip2.7
+      pillars:
+        gpfs.sls:
+          gpfs:
+            kernel_version: 2.6.32-696.20.1.el6
+  - name: centos-7
     driver_config:
-      image: registry.ocf.co.uk/salt/docker/centos-6-kitchen:2017.7
+      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen:base
       privileged: True
-      run_command: /sbin/init
+      run_command: /usr/lib/systemd/systemd
       use_cache: False
       remove_images: True
-  - name: centos-7-201611
+    provisioner:
+      salt_yum_repo: 'https://repo.saltstack.com/yum/redhat/$releasever/$basearch/%s'
+      salt_yum_rpm_key: 'https://repo.saltstack.com/yum/redhat/7/x86_64/latest/SALTSTACK-GPG-KEY.pub'
+      salt_install: yum
+      pillars:
+        gpfs.sls:
+          gpfs:
+            kernel_version: 3.10.0-693.17.1.el7
+  - name: ubuntu-16.04
     driver_config:
-      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen:2016.11
+      image: registry.ocf.co.uk/salt/docker/ubuntu-16.04-kitchen:base
       privileged: True
-      run_command: /usr/sbin/init
+      run_command: /lib/systemd/systemd
       use_cache: False
       remove_images: True
-  - name: centos-7-201707
-    driver_config:
-      image: registry.ocf.co.uk/salt/docker/centos-7-kitchen:2017.7
-      privileged: True
-      run_command: /usr/sbin/init
-      use_cache: False
-      remove_images: True
-  - name: ubuntu-16.04-201611
-    driver_config:
-      image: registry.ocf.co.uk/salt/docker/ubuntu-16.04-kitchen:2016.11
-      privileged: True
-      run_command: /sbin/init
-      use_cache: False
-      remove_images: True
-  - name: ubuntu-16.04-201707
-    driver_config:
-      image: registry.ocf.co.uk/salt/docker/ubuntu-16.04-kitchen:2017.7
-      privileged: True
-      run_command: /sbin/init
-      use_cache: False
-      remove_images: True
+    provisioner:
+      salt_apt_repo: 'https://repo.saltstack.com/apt/ubuntu/16.04/amd64'
+      salt_apt_repo_key: 'https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub'
+      salt_install: apt
 
 provisioner:
   name: salt_solo
   formula: gpfs
   vendor_path: srv/salt
-  pillars-from-files:
-    gpfs.sls: test/pillar
-    ofed.sls: srv/formulas/ofed/test/pillar
   pillars:
     top.sls:
       base:
         "*":
           - gpfs
           - ofed
+    gpfs.sls:
+      gpfs:
+        rebuild: True
+        mcr: True
+        version_type: standard
+        repo:
+          server: mirror.ocf.co.uk
+          path: /gpfs/el7/latest
+    ofed.sls:
+      ofed:
+        ipoib:
+          enabled: False
+        type: dist
   state_top:
     base:
       "*":
@@ -66,4 +76,11 @@ provisioner:
         - gpfs.tuning
 
 suites:
-  - name: default
+  - name: nitrogen
+    provisioner:
+      salt_version: '2017.7'
+      salt_bootstrap_options: -X -p git -p curl -p sudo git 2017.7
+  - name: carbon
+    provisioner:
+      salt_version: '2016.11'
+      salt_bootstrap_options: -X -p git -p curl -p sudo git 2016.11
