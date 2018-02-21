@@ -25,7 +25,7 @@
   stage: test
   script:
     - JOB_NAME=( $CI_JOB_NAME )
-    - kitchen test default-${JOB_NAME[-3]}-${JOB_NAME[-2]}-${JOB_NAME[-1]}
+    - kitchen test ${JOB_NAME[-1]}-${JOB_NAME[-3]}-${JOB_NAME[-2]}
   <<: *build_options
   retry: 1
 
@@ -34,13 +34,13 @@ stages:
   - build
   - deploy
 
-#test centos 6 201611: *test_os
-test centos 7 201611: *test_os
-#test ubuntu 1604 201611: *test_os
+#test centos 6 carbon: *test_os
+test centos 7 carbon: *test_os
+#test ubuntu 1604 carbon: *test_os
 
-#test centos 6 201707: *test_os
-test centos 7 201707: *test_os
-#test ubuntu 1604 201707: *test_os
+#test centos 6 nitrogen: *test_os
+test centos 7 nitrogen: *test_os
+#test ubuntu 1604 nitrogen: *test_os
 
 pylint:
   stage: test
